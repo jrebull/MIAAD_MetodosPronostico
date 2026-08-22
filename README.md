@@ -69,6 +69,38 @@ El baseline estacional gana en nueve de los diez orígenes y empata en el restan
 
 Las libretas se entregan ya ejecutadas, así que todas las celdas conservan su salida y pueden leerse sin correr nada.
 
+## Publicar un entregable
+
+<details>
+<summary><code>tools/publicar.py</code> copia la libreta, la valida, actualiza este README, hace el commit y empuja.</summary>
+
+<br>
+
+```bash
+./tools/publicar.py "~/Library/Mobile Documents/com~apple~CloudDocs/.../263483_Rebull_Laboratorio2.ipynb" \
+    --titulo "Suavizamiento exponencial" \
+    --resumen "Ajuste de ETS sobre la serie semestral y comparación contra los baselines."
+```
+
+El número del entregable se deduce del nombre del archivo y el título, de la portada de la libreta, así que en el caso normal basta con la ruta.
+
+Antes de tocar nada comprueba que la libreta abra como `nbformat` 4, que **ninguna celda de código se haya quedado sin salida**, que no haya salidas de error y que los contadores de ejecución vayan en orden. Es lo mismo que pide la consigna del curso, y conviene que falle aquí y no en la revisión.
+
+Si el entregable ya tiene sección en el README, solo refresca el encabezado y el badge: el cuerpo redactado a mano se conserva. Con `--rehacer` se regenera desde cero.
+
+| Opción | Para qué |
+|---|---|
+| `--num N` | forzar el número si no aparece en el nombre del archivo |
+| `--clase` | `Laboratorio` (por defecto), `Actividad` o `Proyecto` |
+| `--titulo`, `--resumen` | texto de la sección del README |
+| `--carpeta` | carpeta destino, por defecto `<Clase>_<N>` |
+| `--permitir-sin-salida` | seguir aunque falte alguna salida |
+| `--rehacer` | regenerar la sección del README completa |
+| `--sin-push` | dejar el commit sin empujar |
+| `-y` | no pedir confirmación |
+
+</details>
+
 ## Aviso sobre los datos
 
 > El caso del Laboratorio 1 utiliza **datos simulados exclusivamente con fines didácticos**. Las cifras no representan registros de la Universidad Autónoma de Ciudad Juárez ni deben interpretarse como resultados institucionales. Reproducen la *forma* de una serie de deserción agregada para practicar el razonamiento de pronóstico, no para estimar la deserción real de la institución.
