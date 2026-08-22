@@ -130,6 +130,8 @@ Las libretas se entregan ya ejecutadas, así que todas las celdas conservan su s
 
 El número del entregable se deduce del nombre del archivo y el título, de la portada de la libreta, así que en el caso normal basta con la ruta.
 
+> **Cada libreta vive en su carpeta** `<Clase>_<N>/`, que es a donde apuntan los badges de arriba. Si guardas desde Colab con *Guardar una copia en GitHub*, indica esa misma carpeta en la ruta del archivo: dejarla en la raíz crea una segunda copia que acaba divergiendo de la de trabajo.
+
 Antes de tocar nada comprueba que la libreta abra como `nbformat` 4, que **ninguna celda de código se haya quedado sin salida**, que no haya salidas de error y que los contadores de ejecución vayan en orden. Es lo mismo que pide la consigna del curso, y conviene que falle aquí y no en la revisión.
 
 Si el entregable ya tiene sección en el README, solo refresca el encabezado y el badge: el cuerpo redactado a mano se conserva. Con `--rehacer` se regenera desde cero.
