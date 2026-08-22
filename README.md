@@ -62,6 +62,52 @@ El anexo evalúa la variante con deriva solo bajo el esquema *rolling-origin*, q
 
 El baseline estacional gana en nueve de los diez orígenes y empata en el restante. El pronóstico de referencia para 2027-1 es de **62 deserciones** y la decisión recomendada es reservar capacidad para **65**, es decir, el pronóstico más un margen igual al MAE histórico. Pronóstico y decisión se reportan por separado a propósito: el margen es una regla de decisión transparente, no un intervalo de predicción.
 
+### Laboratorio 2 · Del dato observado al pronóstico con SMA, WMA y EMA
+
+[![Abrir en Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/jrebull/MIAAD_MetodosPronostico/blob/main/Laboratorio_2/263483_Rebull_Laboratorio2_Suavizado.ipynb)
+
+Doce semanas de solicitudes recibidas por una oficina de atención ciudadana, usadas para separar dos cosas que se confunden a menudo: describir el pasado y anticipar la semana que todavía no ocurre.
+
+**Qué se hace**
+
+1. Lectura de la serie antes de aplicar método alguno: dirección, avance medio y retrocesos.
+2. Los tres métodos vistos como un reparto de pesos sobre el pasado, y el **retraso medio** que ese reparto implica: 1.00 semanas el SMA, 0.70 el WMA y 2.33 la EMA con $\alpha = 0.3$.
+3. Valores suavizados, que usan el dato de su propia semana.
+4. Conversión a pronósticos de un paso con `.shift(1)`, que es donde el retraso deja de ser gratis.
+5. Comparación en una ventana común a los cinco métodos, con MAE, RMSE y sMAPE, más el error medio con signo.
+6. Los mismos métodos sobre cuatro series construidas con estructuras distintas.
+7. Selección de $\alpha$ con validación temporal y una única evaluación en prueba.
+8. Anexo voluntario: se pone a prueba un ciclo aparente y se corrige el retraso del SMA con una deriva estimada solo con el pasado de cada origen.
+
+**Resultados principales**
+
+Ventana común de nueve semanas, de la 4 a la 12, idéntica para los cinco métodos.
+
+| Método | RMSE | MAE | Error medio con signo |
+|---|---:|---:|---:|
+| Ingenuo | **5.33** | **4.89** | +3.11 |
+| WMA | 5.84 | 5.09 | +4.96 |
+| SMA | 6.37 | 5.78 | +5.78 |
+| Estacional de periodo 2 | 6.57 | 5.56 | +5.56 |
+| EMA, $\alpha = 0.3$ | 9.02 | 8.51 | +8.51 |
+
+**Ningún método de suavizado supera a repetir el último dato.** El error medio es positivo en los cinco: todos se quedan cortos, siempre. Y el orden del sesgo reproduce el del retraso, porque la serie sube 3.09 solicitudes por semana y cada semana de retraso se paga en solicitudes que el pronóstico deja de contar.
+
+Que el ganador depende de la estructura se comprueba sobre cuatro series sintéticas:
+
+| Serie | Menor RMSE | Por qué |
+|---|---|---|
+| Tendencia pura | Ingenuo, 2.00 | Es el de menor retraso; su error es exactamente el incremento por periodo |
+| Nivel estable | EMA, 1.13 | Sin tendencia el retraso no cuesta y promediar cancela ruido |
+| Tendencia y periodo 2 | Estacional 2, 2.00 | Reproduce la alternancia; solo le queda el avance de dos periodos |
+| Estacionalidad periodo 2 | Estacional 2, 0.00 | El dato de dos periodos atrás *es* el que se quiere predecir |
+
+Los suavizados quedan por detrás de una referencia simple en tres de las cuatro series.
+
+La selección de $\alpha$ eligió **0.05**, el valor más pequeño de la rejilla, y la curva de validación resulta monótona creciente: el mínimo cae en el borde, no en un punto interior. En la prueba final, periodos 17 a 20, rinde RMSE 1.178 frente a 1.258 del $\alpha = 0.3$ fijado al inicio y 1.323 del ingenuo. Promediar toda la historia disponible rinde 1.125, que es mejor todavía; la libreta lo reporta como límite del procedimiento en vez de presentar el 0.05 como un parámetro bien estimado.
+
+El anexo cierra dos cabos. El ciclo de tres semanas que insinuaban los retrocesos **no se sostiene**: una referencia que repite el dato de tres semanas atrás da el peor RMSE del anexo, 8.46. En cambio el diagnóstico del retraso sí era correcto: sumando al SMA la deriva estimada con el pasado de cada origen, el RMSE baja de 6.02 a **3.56** y el sesgo pasa de +5.42 a −0.54. Con esa corrección el suavizado sí supera al ingenuo, sobre ocho semanas comparables.
+
 ## Cómo abrir las libretas
 
 - **En Colab:** pulsa el badge de la libreta. No requiere clonar el repositorio.
@@ -103,7 +149,7 @@ Si el entregable ya tiene sección en el README, solo refresca el encabezado y e
 
 ## Aviso sobre los datos
 
-> El caso del Laboratorio 1 utiliza **datos simulados exclusivamente con fines didácticos**. Las cifras no representan registros de la Universidad Autónoma de Ciudad Juárez ni deben interpretarse como resultados institucionales. Reproducen la *forma* de una serie de deserción agregada para practicar el razonamiento de pronóstico, no para estimar la deserción real de la institución.
+> Los casos de ambos laboratorios utilizan **datos didácticos, construidos para el ejercicio**. Las cifras no representan registros de la Universidad Autónoma de Ciudad Juárez ni deben interpretarse como resultados institucionales. Reproducen la *forma* de una serie real (deserción agregada en el primero, demanda de un servicio en el segundo) para practicar el razonamiento de pronóstico, no para estimar nada del mundo real. Las cuatro series comparativas del Laboratorio 2 son deterministas por diseño.
 
 Las libretas parten de las plantillas que entrega el docente y lo que aquí se publica son las respuestas, el análisis y las figuras del estudiante. El material didáctico original del curso (consignas en formato editable, presentaciones y lecturas) es del docente y no se redistribuye en este repositorio.
 
@@ -112,6 +158,8 @@ Las libretas parten de las plantillas que entrega el docente y lo que aquí se p
 - Hyndman, R. J. y Athanasopoulos, G. (2021). *Forecasting: Principles and Practice*, 3.ª ed. OTexts. <https://otexts.com/fpp3/>
 - Hyndman, R. J. y Koehler, A. B. (2006). Another look at measures of forecast accuracy. *International Journal of Forecasting*, 22(4), 679–688. <https://doi.org/10.1016/j.ijforecast.2006.03.001>
 - Tashman, L. J. (2000). Out-of-sample tests of forecasting accuracy: an analysis and review. *International Journal of Forecasting*, 16(4), 437–450. <https://doi.org/10.1016/S0169-2070(00)00065-0>
+- Brown, R. G. (1963). *Smoothing, Forecasting and Prediction of Discrete Time Series*. Prentice-Hall. Origen de la forma recursiva del suavizado exponencial.
+- Makridakis, S., Spiliotis, E. y Assimakopoulos, V. (2020). The M4 Competition: 100,000 time series and 61 forecasting methods. *International Journal of Forecasting*, 36(1), 54–74. <https://doi.org/10.1016/j.ijforecast.2019.04.014>
 - Bergmeir, C. y Benítez, J. M. (2012). On the use of cross-validation for time series predictor evaluation. *Information Sciences*, 191, 192–213. <https://doi.org/10.1016/j.ins.2011.12.028>
 
 La bibliografía completa, numerada por orden de primera aparición, va dentro de cada libreta.
